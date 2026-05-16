@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>雅集 · 中华诗词</title>
+    <title>雅集 · 中华诗词经典</title>
     <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,6 +34,11 @@
 
         .meta-info { display: flex; gap: 16px; font-size: 13px; color: #718096; align-items: center; }
         .meta-item span { font-weight: bold; color: #2d3748; margin-left: 4px; }
+        #metaLibrary {
+            display: inline-flex; align-items: center; min-height: 22px; padding: 2px 9px;
+            border-radius: 999px; background-color: #edf2f7; color: #2b6cb0;
+            border: 1px solid #dbe7f3; letter-spacing: 0.5px;
+        }
 
         .lang-toggle-btn {
             background-color: #cbd5e0; border: none; padding: 2px 8px; border-radius: 4px;
@@ -76,9 +81,15 @@
         .poem-container { width: 100%; height: 100%; max-width: 90%; overflow-y: auto; padding: 20px 10px; display: flex; flex-direction: column; animation: fadeIn 0.4s ease; }
         .poem-container::before, .poem-container::after { content: ''; margin: auto; }
         .poem-inner-wrapper { text-align: center; width: 100%; flex-shrink: 0; }
+        .poem-inner-wrapper.prose-mode {
+            max-width: 680px; margin: 0 auto; text-align: left;
+        }
         .poem-title { font-size: 26px; font-weight: bold; color: #1a202c; margin-bottom: 12px; letter-spacing: 2px; }
         .poem-author { font-size: 15px; color: #718096; margin-bottom: 32px; letter-spacing: 1px; }
         .poem-content { font-size: 19px; line-height: 2.2; color: #2d3748; letter-spacing: 1px; white-space: pre-line; }
+        .poem-inner-wrapper.prose-mode .poem-content {
+            line-height: 2; letter-spacing: 0.5px; text-align: justify; text-justify: inter-ideograph;
+        }
 
         .list-container { width: 100%; flex: 1; height: 100%; overflow-y: auto; padding: 10px; display: none; animation: fadeIn 0.4s ease; }
         .list-container.active { display: block; }
@@ -135,17 +146,45 @@
         ::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
 
         @media (max-width: 600px) {
-            .main-card { padding: 40px 10px; }
+            body { padding: 0; align-items: stretch; background-color: #f4f6f9; }
+            .window-container {
+                height: 100dvh; max-height: none; border-radius: 0; padding: 10px;
+                box-shadow: none; gap: 10px;
+            }
+            .top-header {
+                align-items: stretch; flex-wrap: wrap; gap: 8px; padding: 0 2px;
+            }
+            .header-left { width: 100%; justify-content: center; position: relative; min-height: 38px; }
+            .menu-btn { position: absolute; left: 0; top: 1px; }
+            .site-title { font-size: 19px; }
+            .meta-info {
+                display: flex; width: 100%; justify-content: center; flex-wrap: wrap;
+                gap: 6px 10px; font-size: 11px;
+            }
+            .meta-item { display: inline-flex; align-items: center; white-space: nowrap; }
+            #metaLibrary { min-height: 20px; padding: 1px 7px; }
+            .main-card { padding: 18px 8px; border-radius: 18px; }
+            .poem-container { max-width: 100%; padding: 10px 4px; }
             .poem-title { font-size: 22px; }
+            .poem-author { margin-bottom: 22px; }
             .poem-content { font-size: 17px; line-height: 2; }
-            .meta-info { display: none; }
+            .poem-inner-wrapper.prose-mode { max-width: 100%; }
+            .bottom-action-bar { padding: 10px; border-radius: 14px; }
+            .control-item { width: 100%; justify-content: center; }
+            .select-input { max-width: none; flex: 1; }
             .controls-row { flex-direction: column; gap: 10px; }
             .random-btn { max-width: 100%; width: 100%; order: 3; }
             .view-toggle-group { width: 100%; }
             .toggle-btn { flex: 1; text-align: center; }
             .nav-arrow { display: none; }
             .sidebar-drawer { width: 85%; left: -85%; }
-            .col-cat { display: none; /* 手机屏幕过窄，隐藏分类标签列以保证标题可读性 */ }
+            .poem-list-table th, .poem-list-table td { padding: 10px 5px; font-size: 13px; }
+            .col-title { width: 48%; }
+            .col-author { width: 24%; }
+            .col-cat {
+                display: table-cell; width: 28%; text-align: right; font-size: 12px;
+                white-space: normal; word-break: break-word;
+            }
         }
     </style>
 </head>
@@ -171,7 +210,7 @@
         <div class="top-header">
             <div class="header-left">
                 <button class="menu-btn" id="menuBtn">☰</button>
-                <div class="site-title" data-i18n>雅集 · 中华诗词</div>
+                <div class="site-title" data-i18n>雅集 · 中华诗词经典</div>
             </div>
             <div class="meta-info">
                 <div class="meta-item"><span data-i18n>当前库</span><span id="metaLibrary" data-i18n>中华诗词集</span></div>
@@ -242,6 +281,9 @@
         // 以后上传 GitHub Pages 后，只改 JSON 文件也能继续扩展分类。
         let categoryAliases = {};
         let poemOverrides = [];
+        let exactCategoryNames = new Set();
+        let sourceDefinitions = [];
+        const loadedSourceKeys = new Set();
         let poetryDB = []; 
         let isTraditional = false; 
         
@@ -300,10 +342,9 @@
             });
 
             document.querySelectorAll('.tag-pill').forEach(pill => {
-                pill.addEventListener('click', (e) => {
+                pill.addEventListener('click', async (e) => {
                     syncCategoryUI(e.target.getAttribute('data-cat'));
-                    updateFilteredList();
-                    switchView('list');
+                    await showPoemFromCurrentCategory();
                     closeDrawer();
                 });
             });
@@ -433,6 +474,7 @@
                 category: item.category || options.category,
                 tags,
                 source: options.category,
+                layout: item.layout || options.layout || "center",
                 content,
                 searchText: uniqueList([title, item.author, item.dynasty || options.dynasty, item.category || options.category, ...tags])
                     .join(" ") + " " + content.replace(/<br>/g, " ")
@@ -453,6 +495,35 @@
             return rawItems.map((item, idx) => normalizePoem(item, idx, source));
         }
 
+        function sourceKey(source) {
+            return `${source.category}|${source.path}`;
+        }
+
+        function sourceMatchesCategory(source, catName) {
+            if (catName === "全部") return source.autoload !== false;
+            const sourceTags = uniqueList([source.category, ...(source.tags || [])]);
+            if (source.category === catName || sourceTags.includes(catName)) return true;
+
+            const aliases = categoryAliases[catName] || [];
+            return aliases.some(alias => source.category === alias || sourceTags.includes(alias));
+        }
+
+        function rebuildExactCategoryNames(sources) {
+            exactCategoryNames = new Set([
+                "四书", "五经", "蒙学", "儒家经典"
+            ]);
+
+            sources.forEach(source => {
+                if (source.category) exactCategoryNames.add(source.category);
+            });
+
+            categoryGroups.forEach(group => {
+                if (["典籍合集", "蒙学", "儒家经典"].includes(group.groupName)) {
+                    group.tags.forEach(tag => exactCategoryNames.add(tag));
+                }
+            });
+        }
+
         function mergeDuplicatePoems(items) {
             const map = new Map();
             items.forEach(item => {
@@ -468,13 +539,42 @@
             return [...map.values()];
         }
 
+        async function loadSource(source) {
+            const key = sourceKey(source);
+            if (loadedSourceKeys.has(key)) return [];
+            const data = await fetchJson(source.path, null);
+            const items = normalizeSourceData(data, source);
+            loadedSourceKeys.add(key);
+            return items;
+        }
+
+        async function loadSourcesForCategory(catName) {
+            const sourcesToLoad = sourceDefinitions.filter(source =>
+                !loadedSourceKeys.has(sourceKey(source)) && sourceMatchesCategory(source, catName)
+            );
+            if (sourcesToLoad.length === 0) return;
+
+            const loadingMask = document.getElementById('loadingMask');
+            loadingMask.style.display = 'flex';
+            loadingMask.textContent = t("正在加载诗词数据...");
+            try {
+                const loadedItems = (await Promise.all(sourcesToLoad.map(loadSource))).flat();
+                poetryDB = mergeDuplicatePoems([...poetryDB, ...loadedItems]);
+            } finally {
+                loadingMask.style.display = 'none';
+            }
+        }
+
         function poemMatchesCategory(poem, catName) {
             if (catName === "全部") return true;
             if (poem.category === catName) return true;
             if (poem.tags && poem.tags.includes(catName)) return true;
 
             const aliases = categoryAliases[catName] || [];
+            const exactOnly = exactCategoryNames.has(catName);
+
             if (aliases.some(alias => poem.tags.includes(alias))) return true;
+            if (exactOnly) return aliases.some(alias => poem.category === alias);
 
             const text = poem.searchText || "";
             return aliases.some(alias => text.includes(alias));
@@ -494,19 +594,17 @@
                     poemOverrides = Array.isArray(categoryConfig.poemOverrides) ? categoryConfig.poemOverrides : [];
                 }
 
-                const sources = Array.isArray(sourcesConfig) ? sourcesConfig : [
+                sourceDefinitions = Array.isArray(sourcesConfig) ? sourcesConfig : [
                     { path: './data/tangshi300.json', dynasty: '唐', category: '唐诗三百首', idPrefix: 'tangshi300' },
                     { path: './data/songci300.json', dynasty: '宋', category: '宋词三百首', idPrefix: 'songci300' },
                     { path: './data/shijing.json', dynasty: '先秦', category: '诗经', idPrefix: 'shijing' },
                     { path: './data/custom-poems.json', dynasty: '自定义', category: '自定义', idPrefix: 'custom' }
                 ];
+                rebuildExactCategoryNames(sourceDefinitions);
 
-                const sourcePayloads = await Promise.all(sources.map(async source => {
-                    const data = await fetchJson(source.path, null);
-                    return { source, data };
-                }));
-
-                poetryDB = mergeDuplicatePoems(sourcePayloads.flatMap(({ source, data }) => normalizeSourceData(data, source)));
+                const initialSources = sourceDefinitions.filter(source => source.autoload !== false);
+                const loadedItems = (await Promise.all(initialSources.map(loadSource))).flat();
+                poetryDB = mergeDuplicatePoems(loadedItems);
 
                 if (poetryDB.length === 0) {
                     throw new Error("无可用 JSON");
@@ -542,6 +640,7 @@
         const poemTitle = document.getElementById('poemTitle');
         const poemAuthor = document.getElementById('poemAuthor');
         const poemContent = document.getElementById('poemContent');
+        const poemInnerWrapper = document.querySelector('.poem-inner-wrapper');
         const metaLibrary = document.getElementById('metaLibrary');
         const metaCount = document.getElementById('metaCount');
         const metaMode = document.getElementById('metaMode');
@@ -550,10 +649,19 @@
 
         function initUI() {
             buildCategoryUI();
-            metaCount.textContent = `${poetryDB.length} ${t("首")}`;
+            updateMetaCount();
             updateFilteredList();
-            renderPoem(0); 
+            renderStartupPoem();
             metaMode.textContent = t(currentView === 'list' ? '列表模式' : '阅读模式');
+        }
+
+        function renderStartupPoem() {
+            if (poetryDB.length === 0) return;
+            const randomIndex = Math.floor(Math.random() * poetryDB.length);
+            const poem = poetryDB[randomIndex];
+            syncCategoryUI(poem.category || "全部");
+            updateFilteredList();
+            renderPoem(randomIndex);
         }
 
         function translateGlobalUI() {
@@ -582,12 +690,19 @@
             if (poetryDB.length === 0) return;
             currentPoemIndex = index;
             const p = poetryDB[index];
+            const shouldUseProseMode = p.layout === "prose";
             
             poemTitle.textContent = t(p.title);
             poemAuthor.textContent = t(`${p.dynasty} · ${p.author}`);
             poemContent.innerHTML = t(p.content); 
+            poemInnerWrapper.classList.toggle('prose-mode', shouldUseProseMode);
             metaLibrary.textContent = t(currentCategory === "全部" ? p.category : currentCategory);
             poemContainer.scrollTop = 0;
+        }
+
+        function updateMetaCount() {
+            const count = currentCategory === "全部" ? poetryDB.length : filteredList.length;
+            metaCount.textContent = `${count} ${t("首")}`;
         }
 
         function syncCategoryUI(catName) {
@@ -605,7 +720,24 @@
 
         function updateFilteredList() {
             filteredList = poetryDB.filter(p => poemMatchesCategory(p, currentCategory));
+            updateMetaCount();
             renderListTable();
+        }
+
+        async function showPoemFromCurrentCategory() {
+            await loadSourcesForCategory(currentCategory);
+            updateFilteredList();
+            if (filteredList.length === 0) {
+                switchView('list');
+                return;
+            }
+            if (filteredList.length === 1) {
+                const onlyIndex = poetryDB.findIndex(item => item.id === filteredList[0].id);
+                switchView('read');
+                renderPoem(onlyIndex >= 0 ? onlyIndex : 0);
+                return;
+            }
+            switchView('list');
         }
 
         function renderListTable() {
@@ -665,17 +797,22 @@
         document.getElementById('closeDrawerBtn').addEventListener('click', closeDrawer);
         drawerOverlay.addEventListener('click', closeDrawer);
 
-        categorySelect.addEventListener('change', (e) => {
+        categorySelect.addEventListener('change', async (e) => {
             syncCategoryUI(e.target.value);
-            updateFilteredList();
-            if (currentView === 'list') renderListTable();
+            await showPoemFromCurrentCategory();
         });
 
         /* 优化点 2：修复随机算法，确保每次点击都换首 */
-        randomBtn.addEventListener('click', () => {
+        randomBtn.addEventListener('click', async () => {
+            await loadSourcesForCategory(currentCategory);
             switchView('read');
             let pool = poetryDB.filter(p => poemMatchesCategory(p, currentCategory));
-            if (pool.length <= 1) return; // 只有一首就不切了
+            if (pool.length === 0) return;
+            if (pool.length === 1) {
+                const onlyIndex = poetryDB.findIndex(item => item.id === pool[0].id);
+                renderPoem(onlyIndex >= 0 ? onlyIndex : 0);
+                return;
+            }
 
             let newIndex = currentPoemIndex;
             // 循环抽取，直到抽到的索引不等于当前正在显示的索引
@@ -695,13 +832,15 @@
         document.getElementById('searchBtn').addEventListener('click', executeSearch);
         searchInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') executeSearch(); });
         
-        function executeSearch() {
+        async function executeSearch() {
+            await loadSourcesForCategory(currentCategory);
             const keyword = searchInput.value.trim().toLowerCase();
             if (keyword === "") { updateFilteredList(); switchView('list'); return; }
             filteredList = poetryDB.filter(p =>
                 poemMatchesCategory(p, currentCategory) &&
                 (p.searchText || `${p.title} ${p.author} ${p.content}`).toLowerCase().includes(keyword)
             );
+            updateMetaCount();
             switchView('list'); closeDrawer();
         }
 
