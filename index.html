@@ -46,6 +46,24 @@
             cursor: pointer; transition: all 0.2s; margin-left: 4px;
         }
         .lang-toggle-btn:hover { background-color: #a0aec0; color: #ffffff; }
+        .theme-toggle-btn {
+            width: 24px; height: 24px; border: none; border-radius: 50%;
+            background-color: #edf2f7; color: #4a5568; cursor: pointer;
+            font-size: 13px; line-height: 1; margin-left: 4px; transition: all 0.2s;
+        }
+        .theme-toggle-btn:hover { background-color: #d6bc8c; color: #2d2216; }
+        .about-link {
+            border: none; background: transparent; color: #a0aec0; cursor: pointer;
+            font-family: inherit; font-size: 11px; padding: 2px 4px; opacity: 0.55;
+        }
+        .about-link:hover { opacity: 1; color: #2b6cb0; }
+        .about-popover {
+            position: absolute; top: 58px; left: 78px; z-index: 80; display: none;
+            width: min(280px, calc(100% - 40px)); padding: 10px 12px; border-radius: 10px;
+            background-color: rgba(255,255,255,0.96); color: #4a5568; border: 1px solid #edf2f7;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08); font-size: 12px; line-height: 1.8;
+        }
+        .about-popover.show { display: block; }
 
         .main-card {
             background-color: #ffffff; border-radius: 20px; flex: 1; min-height: 0; padding: 30px 40px; 
@@ -64,6 +82,10 @@
         .search-box { display: flex; gap: 6px; }
         .search-input { flex: 1; padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; font-family: inherit; outline: none; }
         .search-input:focus { border-color: #3182ce; }
+        .search-btn {
+            padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 6px;
+            background-color: #ffffff; color: #4a5568; font-family: inherit; cursor: pointer;
+        }
 
         .category-matrix { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 16px; padding-right: 4px; }
         .tag-group-title { font-size: 13px; font-weight: bold; color: #a0aec0; margin-bottom: 8px; }
@@ -128,6 +150,16 @@
         }
         .random-btn:hover { background-color: #ebf8ff; color: #2b6cb0; border-color: #bee3f8; }
         .random-btn:active { transform: scale(0.98); }
+        .random-cluster { flex: 1; max-width: 330px; display: flex; align-items: center; gap: 6px; }
+        .random-cluster .random-btn { max-width: none; width: auto; }
+        .mini-action-btn {
+            width: 34px; height: 34px; flex: 0 0 34px; border: 1px solid #cbd5e0; border-radius: 8px;
+            background-color: #ffffff; color: #4a5568; cursor: pointer; font-family: inherit;
+            font-size: 16px; line-height: 1; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .mini-action-btn:hover { background-color: #ebf8ff; color: #2b6cb0; border-color: #bee3f8; }
+        .mini-action-btn:disabled { opacity: 0.38; cursor: default; background-color: #f7fafc; color: #a0aec0; }
+        .mini-action-btn.favorite.active { color: #d53f8c; border-color: #fbb6ce; background-color: #fff5f7; }
 
         .select-input { 
             padding: 6px 30px 6px 12px; border: 1px solid #cbd5e0; border-radius: 8px; background-color: #ffffff; font-family: inherit; font-size: 14px; outline: none; cursor: pointer; appearance: none; 
@@ -145,8 +177,98 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
 
+        body.dark-theme {
+            background-color: #1f1a14; color: #eadfce;
+        }
+        body.dark-theme .window-container {
+            background-color: #2a231b; box-shadow: 0 10px 30px rgba(0,0,0,0.22);
+        }
+        body.dark-theme .main-card,
+        body.dark-theme .sidebar-drawer {
+            background-color: #302820; box-shadow: inset 0 0 1px rgba(255,255,255,0.12);
+        }
+        body.dark-theme .site-title,
+        body.dark-theme .poem-title,
+        body.dark-theme .drawer-title,
+        body.dark-theme .meta-item span {
+            color: #f4eadb;
+        }
+        body.dark-theme .poem-content,
+        body.dark-theme .col-author,
+        body.dark-theme .control-item,
+        body.dark-theme .menu-btn,
+        body.dark-theme .toggle-btn {
+            color: #eadfce;
+        }
+        body.dark-theme .poem-author,
+        body.dark-theme .meta-info,
+        body.dark-theme .tag-group-title,
+        body.dark-theme .poem-list-table th,
+        body.dark-theme .col-cat {
+            color: #b9a991;
+        }
+        body.dark-theme .bottom-action-bar,
+        body.dark-theme .view-toggle-group {
+            background-color: #403324;
+        }
+        body.dark-theme .random-btn,
+        body.dark-theme .mini-action-btn,
+        body.dark-theme .select-input,
+        body.dark-theme .search-input,
+        body.dark-theme .search-btn,
+        body.dark-theme .tag-pill,
+        body.dark-theme .theme-toggle-btn,
+        body.dark-theme .lang-toggle-btn {
+            background-color: #261f18; border-color: #5a4935; color: #eadfce;
+        }
+        body.dark-theme .select-input {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23eadfce' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        }
+        body.dark-theme .tag-pill:hover,
+        body.dark-theme .random-btn:hover,
+        body.dark-theme .mini-action-btn:hover,
+        body.dark-theme .search-btn:hover,
+        body.dark-theme .toggle-btn.active,
+        body.dark-theme .menu-btn:hover {
+            background-color: #4a3926; border-color: #b89157; color: #f8e5bf;
+        }
+        body.dark-theme .tag-pill.active {
+            background-color: #a36f36; border-color: #a36f36; color: #fff7e8;
+        }
+        body.dark-theme #metaLibrary {
+            background-color: #3d3022; border-color: #5b4631; color: #f0c987;
+        }
+        body.dark-theme .drawer-header,
+        body.dark-theme .poem-list-table th,
+        body.dark-theme .poem-list-table td {
+            border-color: #4b3d2d;
+        }
+        body.dark-theme .poem-list-table tr:hover {
+            background-color: #392e22;
+        }
+        body.dark-theme .col-title {
+            color: #e2b873;
+        }
+        body.dark-theme .about-link {
+            color: #8e806e;
+        }
+        body.dark-theme .about-link:hover {
+            color: #f0c987;
+        }
+        body.dark-theme .about-popover {
+            background-color: rgba(48,40,32,0.98); color: #eadfce; border-color: #5a4935;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.24);
+        }
+        body.dark-theme .loading-mask {
+            background: rgba(42,35,27,0.92); color: #f0c987;
+        }
+        body.dark-theme ::-webkit-scrollbar-thumb {
+            background: #6d573c;
+        }
+
         @media (max-width: 600px) {
             body { padding: 0; align-items: stretch; background-color: #f4f6f9; }
+            body.dark-theme { background-color: #2a231b; }
             .window-container {
                 height: 100dvh; max-height: none; border-radius: 0; padding: 10px;
                 box-shadow: none; gap: 10px;
@@ -157,6 +279,8 @@
             .header-left { width: 100%; justify-content: center; position: relative; min-height: 38px; }
             .menu-btn { position: absolute; left: 0; top: 1px; }
             .site-title { font-size: 19px; }
+            .about-link { position: absolute; right: 0; top: 9px; }
+            .about-popover { top: 48px; left: 12px; width: calc(100% - 24px); }
             .meta-info {
                 display: flex; width: 100%; justify-content: center; flex-wrap: wrap;
                 gap: 6px 10px; font-size: 11px;
@@ -173,7 +297,8 @@
             .control-item { width: 100%; justify-content: center; }
             .select-input { max-width: none; flex: 1; }
             .controls-row { flex-direction: column; gap: 10px; }
-            .random-btn { max-width: 100%; width: 100%; order: 3; }
+            .random-cluster { max-width: 100%; width: 100%; order: 3; }
+            .random-btn { max-width: 100%; width: 100%; }
             .view-toggle-group { width: 100%; }
             .toggle-btn { flex: 1; text-align: center; }
             .nav-arrow { display: none; }
@@ -211,13 +336,16 @@
             <div class="header-left">
                 <button class="menu-btn" id="menuBtn">☰</button>
                 <div class="site-title" data-i18n>雅集 · 中华诗词经典</div>
+                <button class="about-link" id="aboutBtn" type="button">关于</button>
             </div>
+            <div class="about-popover" id="aboutPopover">程序员，古诗爱好者，喜欢网页设计。该网站作于2026.5.16，留给日常翻阅与偶然相遇。</div>
             <div class="meta-info">
                 <div class="meta-item"><span data-i18n>当前库</span><span id="metaLibrary" data-i18n>中华诗词集</span></div>
                 <div class="meta-item"><span data-i18n>收录数</span><span id="metaCount">0 首</span></div>
                 <div style="display:flex; align-items:center;">
                     <div class="meta-item"><span data-i18n>当前模式</span><span id="metaMode">阅读模式</span></div>
                     <button class="lang-toggle-btn" id="langToggleBtn">繁</button>
+                    <button class="theme-toggle-btn" id="themeToggleBtn" type="button" title="切换夜间模式">☾</button>
                 </div>
             </div>
         </div>
@@ -255,7 +383,12 @@
                     <span data-i18n>分类</span>
                     <select class="select-input" id="categorySelect"></select>
                 </div>
-                <button class="random-btn" id="randomBtn" data-i18n>随机一首</button>
+                <div class="random-cluster">
+                    <button class="mini-action-btn" id="historyBackBtn" type="button" title="后退">‹</button>
+                    <button class="random-btn" id="randomBtn" data-i18n>随机一首</button>
+                    <button class="mini-action-btn" id="historyForwardBtn" type="button" title="前进">›</button>
+                    <button class="mini-action-btn favorite" id="favoriteBtn" type="button" title="收藏">♡</button>
+                </div>
                 <div class="control-item">
                     <span data-i18n>视图</span>
                     <div class="view-toggle-group">
@@ -284,6 +417,9 @@
         let exactCategoryNames = new Set();
         let sourceDefinitions = [];
         const loadedSourceKeys = new Set();
+        let readingHistory = [];
+        let readingHistoryCursor = -1;
+        let favoriteIds = new Set();
         let poetryDB = []; 
         let isTraditional = false; 
         
@@ -386,14 +522,14 @@
         }
 
         function normalizeContent(item) {
-            const lines = item.paragraphs || item.strains || (isTextArray(item.content) ? item.content : []);
+            const lines = item.paragraphs || item.para || item.strains || (isTextArray(item.content) ? item.content : []);
             if (Array.isArray(lines)) return lines.join('<br>');
             if (typeof lines === "string") return lines.replace(/\n/g, '<br>');
             return "解析失败";
         }
 
         function hasOwnText(item) {
-            return Boolean(item && (item.paragraphs || item.strains || isTextArray(item.content)));
+            return Boolean(item && (item.paragraphs || item.para || item.strains || isTextArray(item.content)));
         }
 
         function titleFromParts(parts, fallbackTitle) {
@@ -500,6 +636,7 @@
         }
 
         function sourceMatchesCategory(source, catName) {
+            if (catName === "我的收藏") return source.autoload !== false;
             if (catName === "全部") return source.autoload !== false;
             const sourceTags = uniqueList([source.category, ...(source.tags || [])]);
             if (source.category === catName || sourceTags.includes(catName)) return true;
@@ -565,8 +702,30 @@
             }
         }
 
+        async function loadAllSourcesForSearch() {
+            const sourcesToLoad = sourceDefinitions.filter(source => !loadedSourceKeys.has(sourceKey(source)));
+            if (sourcesToLoad.length === 0) return;
+
+            const loadingMask = document.getElementById('loadingMask');
+            const chunkSize = 24;
+            let loadedCount = 0;
+            loadingMask.style.display = 'flex';
+            try {
+                for (let i = 0; i < sourcesToLoad.length; i += chunkSize) {
+                    const chunk = sourcesToLoad.slice(i, i + chunkSize);
+                    loadingMask.textContent = t(`正在加载全库用于搜索... ${loadedCount}/${sourcesToLoad.length}`);
+                    const loadedItems = (await Promise.all(chunk.map(loadSource))).flat();
+                    poetryDB = mergeDuplicatePoems([...poetryDB, ...loadedItems]);
+                    loadedCount += chunk.length;
+                }
+            } finally {
+                loadingMask.style.display = 'none';
+            }
+        }
+
         function poemMatchesCategory(poem, catName) {
             if (catName === "全部") return true;
+            if (catName === "我的收藏") return favoriteIds.has(poem.id);
             if (poem.category === catName) return true;
             if (poem.tags && poem.tags.includes(catName)) return true;
 
@@ -622,6 +781,7 @@
         let currentCategory = "全部"; 
         let currentView = "read"; 
         let filteredList = [];
+        let currentSearchKeyword = "";
 
         const menuBtn = document.getElementById('menuBtn');
         const sidebarDrawer = document.getElementById('sidebarDrawer');
@@ -629,6 +789,9 @@
         const closeDrawerBtn = document.getElementById('closeDrawerBtn');
         const categorySelect = document.getElementById('categorySelect');
         const randomBtn = document.getElementById('randomBtn');
+        const historyBackBtn = document.getElementById('historyBackBtn');
+        const historyForwardBtn = document.getElementById('historyForwardBtn');
+        const favoriteBtn = document.getElementById('favoriteBtn');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const poemContainer = document.getElementById('poemContainer');
@@ -646,13 +809,67 @@
         const metaMode = document.getElementById('metaMode');
         const searchInput = document.getElementById('searchInput');
         const langToggleBtn = document.getElementById('langToggleBtn');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const aboutBtn = document.getElementById('aboutBtn');
+        const aboutPopover = document.getElementById('aboutPopover');
 
         function initUI() {
+            restoreFavorites();
+            restoreTheme();
             buildCategoryUI();
             updateMetaCount();
             updateFilteredList();
             renderStartupPoem();
             metaMode.textContent = t(currentView === 'list' ? '列表模式' : '阅读模式');
+        }
+
+        function restoreFavorites() {
+            try {
+                favoriteIds = new Set(JSON.parse(localStorage.getItem('poetryFavorites') || '[]'));
+            } catch (error) {
+                favoriteIds = new Set();
+            }
+        }
+
+        function saveFavorites() {
+            localStorage.setItem('poetryFavorites', JSON.stringify([...favoriteIds]));
+        }
+
+        function applyTheme(theme) {
+            const nextTheme = theme === 'dark' ? 'dark' : 'light';
+            document.body.classList.toggle('dark-theme', nextTheme === 'dark');
+            themeToggleBtn.textContent = nextTheme === 'dark' ? '☀' : '☾';
+            themeToggleBtn.title = nextTheme === 'dark' ? '切换白天模式' : '切换夜间模式';
+            localStorage.setItem('poetryTheme', nextTheme);
+        }
+
+        function restoreTheme() {
+            applyTheme(localStorage.getItem('poetryTheme') || 'light');
+        }
+
+        function updateHistoryButtons() {
+            historyBackBtn.disabled = readingHistoryCursor <= 0;
+            historyForwardBtn.disabled = readingHistoryCursor >= readingHistory.length - 1;
+        }
+
+        function updateFavoriteButton() {
+            const poem = poetryDB[currentPoemIndex];
+            const active = Boolean(poem && favoriteIds.has(poem.id));
+            favoriteBtn.classList.toggle('active', active);
+            favoriteBtn.textContent = active ? '♥' : '♡';
+            favoriteBtn.title = active ? '取消收藏' : '收藏';
+        }
+
+        function recordHistory(poemId) {
+            if (!poemId) return;
+            if (readingHistory[readingHistoryCursor] === poemId) {
+                updateHistoryButtons();
+                return;
+            }
+            readingHistory = readingHistory.slice(0, readingHistoryCursor + 1);
+            readingHistory.push(poemId);
+            readingHistoryCursor = readingHistory.length - 1;
+            updateHistoryButtons();
         }
 
         function renderStartupPoem() {
@@ -682,11 +899,11 @@
             
             metaMode.textContent = t(currentView === 'list' ? '列表模式' : '阅读模式');
             
-            renderPoem(currentPoemIndex);
+            renderPoem(currentPoemIndex, false);
             if(currentView === 'list') renderListTable();
         }
 
-        function renderPoem(index) {
+        function renderPoem(index, recordVisit = true) {
             if (poetryDB.length === 0) return;
             currentPoemIndex = index;
             const p = poetryDB[index];
@@ -698,14 +915,17 @@
             poemInnerWrapper.classList.toggle('prose-mode', shouldUseProseMode);
             metaLibrary.textContent = t(currentCategory === "全部" ? p.category : currentCategory);
             poemContainer.scrollTop = 0;
+            if (recordVisit) recordHistory(p.id);
+            updateFavoriteButton();
         }
 
         function updateMetaCount() {
-            const count = currentCategory === "全部" ? poetryDB.length : filteredList.length;
+            const count = currentSearchKeyword ? filteredList.length : (currentCategory === "全部" ? poetryDB.length : filteredList.length);
             metaCount.textContent = `${count} ${t("首")}`;
         }
 
         function syncCategoryUI(catName) {
+            currentSearchKeyword = "";
             currentCategory = catName;
             metaLibrary.textContent = t(catName === "全部" ? "中华诗词集" : catName);
             categorySelect.value = catName;
@@ -792,6 +1012,22 @@
             translateGlobalUI();
         });
 
+        themeToggleBtn.addEventListener('click', () => {
+            const isDark = document.body.classList.contains('dark-theme');
+            applyTheme(isDark ? 'light' : 'dark');
+        });
+
+        aboutBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            aboutPopover.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!aboutPopover.classList.contains('show')) return;
+            if (aboutPopover.contains(event.target) || aboutBtn.contains(event.target)) return;
+            aboutPopover.classList.remove('show');
+        });
+
         menuBtn.addEventListener('click', () => { sidebarDrawer.classList.add('open'); drawerOverlay.classList.add('show'); });
         const closeDrawer = () => { sidebarDrawer.classList.remove('open'); drawerOverlay.classList.remove('show'); };
         document.getElementById('closeDrawerBtn').addEventListener('click', closeDrawer);
@@ -823,6 +1059,32 @@
             renderPoem(newIndex);
         });
 
+        function navigateReadingHistory(offset) {
+            const nextCursor = readingHistoryCursor + offset;
+            if (nextCursor < 0 || nextCursor >= readingHistory.length) return;
+            const poemId = readingHistory[nextCursor];
+            const nextIndex = poetryDB.findIndex(item => item.id === poemId);
+            if (nextIndex < 0) return;
+            readingHistoryCursor = nextCursor;
+            switchView('read');
+            renderPoem(nextIndex, false);
+            updateHistoryButtons();
+        }
+
+        historyBackBtn.addEventListener('click', () => navigateReadingHistory(-1));
+        historyForwardBtn.addEventListener('click', () => navigateReadingHistory(1));
+        favoriteBtn.addEventListener('click', () => {
+            const poem = poetryDB[currentPoemIndex];
+            if (!poem) return;
+            if (favoriteIds.has(poem.id)) {
+                favoriteIds.delete(poem.id);
+            } else {
+                favoriteIds.add(poem.id);
+            }
+            saveFavorites();
+            updateFavoriteButton();
+        });
+
         prevBtn.addEventListener('click', (e) => { e.preventDefault(); switchView('read'); renderPoem(currentPoemIndex - 1 < 0 ? poetryDB.length - 1 : currentPoemIndex - 1); });
         nextBtn.addEventListener('click', (e) => { e.preventDefault(); switchView('read'); renderPoem(currentPoemIndex + 1 >= poetryDB.length ? 0 : currentPoemIndex + 1); });
 
@@ -833,13 +1095,26 @@
         searchInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') executeSearch(); });
         
         async function executeSearch() {
-            await loadSourcesForCategory(currentCategory);
             const keyword = searchInput.value.trim().toLowerCase();
-            if (keyword === "") { updateFilteredList(); switchView('list'); return; }
+            if (keyword === "") {
+                currentSearchKeyword = "";
+                updateFilteredList();
+                switchView('list');
+                return;
+            }
+            currentSearchKeyword = keyword;
+            await loadAllSourcesForSearch();
+            const keywordVariants = uniqueList([
+                keyword,
+                converterToHant(keyword),
+                converterToHans(keyword)
+            ]).map(item => item.toLowerCase());
             filteredList = poetryDB.filter(p =>
-                poemMatchesCategory(p, currentCategory) &&
-                (p.searchText || `${p.title} ${p.author} ${p.content}`).toLowerCase().includes(keyword)
+                keywordVariants.some(item =>
+                    (p.searchText || `${p.title} ${p.author} ${p.content}`).toLowerCase().includes(item)
+                )
             );
+            metaLibrary.textContent = t(`搜索：${keyword}`);
             updateMetaCount();
             switchView('list'); closeDrawer();
         }
