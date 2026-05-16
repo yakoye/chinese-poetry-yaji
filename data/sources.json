@@ -1,0 +1,46 @@
+[
+  {
+    "path": "./data/tangshi300.json",
+    "category": "唐诗三百首",
+    "dynasty": "唐",
+    "idPrefix": "tangshi300"
+  },
+  {
+    "path": "./data/songci300.json",
+    "category": "宋词三百首",
+    "dynasty": "宋",
+    "idPrefix": "songci300"
+  },
+  {
+    "path": "./data/shijing.json",
+    "category": "诗经",
+    "dynasty": "先秦",
+    "idPrefix": "shijing"
+  },
+  {
+    "path": "./data/custom-poems.json",
+    "category": "自定义",
+    "dynasty": "自定义",
+    "idPrefix": "custom"
+  },
+
+  { "path": "./data/mengxue/baijiaxing.json", "category": "百家姓", "dynasty": "北宋", "idPrefix": "baijiaxing" },
+  { "path": "./data/mengxue/dizigui.json", "category": "弟子规", "dynasty": "清", "idPrefix": "dizigui" },
+  { "path": "./data/mengxue/guwenguanzhi.json", "category": "古文观止", "dynasty": "清", "idPrefix": "guwenguanzhi" },
+  { "path": "./data/mengxue/qianjiashi.json", "category": "千家诗", "dynasty": "宋", "idPrefix": "qianjiashi" },
+  { "path": "./data/mengxue/qianziwen.json", "category": "千字文", "dynasty": "南北朝", "idPrefix": "qianziwen" },
+  { "path": "./data/mengxue/sanzijing-new.json", "category": "三字经", "dynasty": "宋", "idPrefix": "sanzijing_new" },
+  { "path": "./data/mengxue/sanzijing-traditional.json", "category": "三字经", "dynasty": "宋", "idPrefix": "sanzijing_traditional" },
+  { "path": "./data/mengxue/shenglvqimeng.json", "category": "声律启蒙", "dynasty": "清", "idPrefix": "shenglvqimeng" },
+  { "path": "./data/mengxue/tangshisanbaishou.json", "category": "唐诗三百首", "dynasty": "唐", "idPrefix": "mengxue_tangshisanbaishou" },
+  { "path": "./data/mengxue/wenzimengqiu.json", "category": "文字蒙求", "dynasty": "清", "idPrefix": "wenzimengqiu" },
+  { "path": "./data/mengxue/youxueqionglin.json", "category": "幼学琼林", "dynasty": "明", "idPrefix": "youxueqionglin" },
+  { "path": "./data/mengxue/zengguangxianwen.json", "category": "增广贤文", "dynasty": "明", "idPrefix": "zengguangxianwen" },
+  { "path": "./data/mengxue/zhuzijiaxun.json", "category": "朱子家训", "dynasty": "清", "idPrefix": "zhuzijiaxun" },
+
+  { "path": "./data/lunyu/lunyu.json", "category": "论语", "dynasty": "先秦", "idPrefix": "lunyu" },
+
+  { "path": "./data/sishuwujing/daxue.json", "category": "大学", "dynasty": "先秦", "idPrefix": "daxue" },
+  { "path": "./data/sishuwujing/mengzi.json", "category": "孟子", "dynasty": "先秦", "idPrefix": "mengzi" },
+  { "path": "./data/sishuwujing/zhongyong.json", "category": "中庸", "dynasty": "先秦", "idPrefix": "zhongyong" }
+]
