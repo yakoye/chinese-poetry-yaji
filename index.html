@@ -181,6 +181,7 @@
         }
         .mini-action-btn:hover { background-color: #ebf8ff; color: #2b6cb0; border-color: #bee3f8; }
         .mini-action-btn:disabled { opacity: 0.38; cursor: default; background-color: #f7fafc; color: #a0aec0; }
+        .mini-action-btn.view-active { background-color: #ebf8ff; color: #2b6cb0; border-color: #90cdf4; }
         .mini-action-btn.favorite.active { color: #d53f8c; border-color: #fbb6ce; background-color: #fff5f7; }
 
         .select-input { 
@@ -363,7 +364,7 @@
             
             <div class="search-box">
                 <div class="search-field">
-                    <input type="text" class="search-input" id="searchInput" placeholder="输入关键字...">
+                    <input type="text" class="search-input" id="searchInput" placeholder="输入关键字..." enterkeyhint="search">
                     <button class="clear-search-btn" id="clearSearchBtn" type="button" title="清除搜索">×</button>
                 </div>
             </div>
@@ -420,6 +421,7 @@
             <div class="controls-row">
                 <div class="random-cluster">
                     <button class="mini-action-btn" id="historyBackBtn" type="button" title="后退">‹</button>
+                    <button class="mini-action-btn" id="showListBtn" type="button" title="查看列表">☷</button>
                     <button class="random-btn" id="randomBtn" data-i18n>随机一首</button>
                     <button class="mini-action-btn favorite" id="favoriteBtn" type="button" title="收藏">♡</button>
                     <button class="mini-action-btn" id="historyForwardBtn" type="button" title="前进">›</button>
@@ -874,6 +876,7 @@
         const categorySelect = document.getElementById('categorySelect') || selectContainer;
         const randomBtn = document.getElementById('randomBtn');
         const historyBackBtn = document.getElementById('historyBackBtn');
+        const showListBtn = document.getElementById('showListBtn');
         const historyForwardBtn = document.getElementById('historyForwardBtn');
         const favoriteBtn = document.getElementById('favoriteBtn');
         const prevBtn = document.getElementById('prevBtn');
@@ -896,7 +899,6 @@
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         const aboutBtn = document.getElementById('aboutBtn');
         const aboutPopover = document.getElementById('aboutPopover');
-        let searchDebounceTimer = null;
 
         function initUI() {
             restoreFavorites();
@@ -1132,6 +1134,8 @@
 
         function switchView(view) {
             currentView = view;
+            showListBtn.classList.toggle('view-active', view === 'list');
+            showListBtn.title = view === 'list' ? '返回阅读' : '查看列表';
             if (view === 'list') {
                 poemContainer.style.display = 'none';
                 listContainer.classList.add('active');
@@ -1144,6 +1148,25 @@
                 setViewList.classList.remove('active');
                 setViewRead.classList.add('active');
             }
+        }
+
+        function showCurrentList() {
+            if (currentView === 'list') {
+                switchView('read');
+                if (poetryDB[currentPoemIndex]) renderPoem(currentPoemIndex, false);
+                return;
+            }
+            if (currentSearchKeyword) {
+                updateSearchResults(getSearchKeywordVariants(currentSearchKeyword));
+            } else {
+                const poem = poetryDB[currentPoemIndex];
+                if (poem && !poemMatchesCategory(poem, currentCategory)) {
+                    currentCategory = poem.category || currentCategory;
+                    updateCategoryControl(currentCategory);
+                }
+                updateFilteredList();
+            }
+            switchView('list');
         }
 
         langToggleBtn.addEventListener('click', () => {
@@ -1226,6 +1249,7 @@
         }
 
         historyBackBtn.addEventListener('click', () => navigateReadingHistory(-1));
+        showListBtn.addEventListener('click', showCurrentList);
         historyForwardBtn.addEventListener('click', () => navigateReadingHistory(1));
         favoriteBtn.addEventListener('click', () => {
             const poem = poetryDB[currentPoemIndex];
@@ -1247,20 +1271,21 @@
         setViewRead.addEventListener('click', () => { switchView('read'); closeDrawer(); });
 
         clearSearchBtn.addEventListener('click', () => {
-            clearTimeout(searchDebounceTimer);
             clearSearchState();
             searchInput.focus();
         });
         searchInput.addEventListener('input', () => {
             updateClearSearchButton();
-            clearTimeout(searchDebounceTimer);
             if (searchInput.value.trim() === "") {
                 clearSearchState();
-                return;
             }
-            searchDebounceTimer = setTimeout(() => executeSearch(true), 450);
         });
-        searchInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') executeSearch(true); });
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                executeSearch(true);
+            }
+        });
         
         async function executeSearch(shouldCloseDrawer = true) {
             const keyword = searchInput.value.trim().toLowerCase();
