@@ -96,6 +96,13 @@
         }
         .tag-pill:hover { background-color: #ebf8ff; border-color: #bee3f8; color: #2b6cb0; }
         .tag-pill.active { background-color: #3182ce; border-color: #3182ce; color: #ffffff; font-weight: bold; }
+        .tag-pill[data-cat="我的收藏"] {
+            border-color: #fbb6ce; color: #b83280; background-color: #fff5f7;
+        }
+        .tag-pill[data-cat="我的收藏"]:hover,
+        .tag-pill[data-cat="我的收藏"].active {
+            background-color: #d53f8c; border-color: #d53f8c; color: #ffffff;
+        }
 
         .drawer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.2); z-index: 90; display: none; }
         .drawer-overlay.show { display: block; }
@@ -234,6 +241,13 @@
         }
         body.dark-theme .tag-pill.active {
             background-color: #a36f36; border-color: #a36f36; color: #fff7e8;
+        }
+        body.dark-theme .tag-pill[data-cat="我的收藏"] {
+            background-color: #3b242d; border-color: #8f5570; color: #f4b8cc;
+        }
+        body.dark-theme .tag-pill[data-cat="我的收藏"]:hover,
+        body.dark-theme .tag-pill[data-cat="我的收藏"].active {
+            background-color: #a84f73; border-color: #a84f73; color: #fff7f9;
         }
         body.dark-theme #metaLibrary {
             background-color: #3d3022; border-color: #5b4631; color: #f0c987;
@@ -403,6 +417,7 @@
     <script>
         let categoryGroups = [
             { groupName: "全部", tags: ["全部"] },
+            { groupName: "收藏", tags: ["我的收藏"] },
             { groupName: "典籍合集", tags: ["唐诗三百首", "宋词三百首", "古诗三百", "诗经", "楚辞", "乐府", "古诗十九", "全唐诗", "全宋词", "花间集", "纳兰词"] },
             { groupName: "教材同步", tags: ["小学古诗", "初中古诗", "高中古诗", "小学文言", "初中文言", "高中文言"] },
             { groupName: "主题与风格", tags: ["写景", "咏物", "怀古", "抒情", "爱国", "离别", "送别", "思乡", "思念", "爱情", "励志", "哲理", "闺怨", "悼亡", "婉约", "豪放", "民谣", "劝学"] },
@@ -636,7 +651,7 @@
         }
 
         function sourceMatchesCategory(source, catName) {
-            if (catName === "我的收藏") return source.autoload !== false;
+            if (catName === "我的收藏") return true;
             if (catName === "全部") return source.autoload !== false;
             const sourceTags = uniqueList([source.category, ...(source.tags || [])]);
             if (source.category === catName || sourceTags.includes(catName)) return true;
@@ -1083,6 +1098,7 @@
             }
             saveFavorites();
             updateFavoriteButton();
+            if (currentCategory === "我的收藏") updateFilteredList();
         });
 
         prevBtn.addEventListener('click', (e) => { e.preventDefault(); switchView('read'); renderPoem(currentPoemIndex - 1 < 0 ? poetryDB.length - 1 : currentPoemIndex - 1); });
