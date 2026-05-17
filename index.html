@@ -682,7 +682,7 @@
 
         function rebuildExactCategoryNames(sources) {
             exactCategoryNames = new Set([
-                "四书", "五经", "蒙学", "儒家经典"
+                "四书", "五经", "蒙学", "儒家经典", "道家经典", "佛教经典", "佛教十三经"
             ]);
 
             sources.forEach(source => {
@@ -690,7 +690,7 @@
             });
 
             categoryGroups.forEach(group => {
-                if (["典籍合集", "蒙学", "儒家经典"].includes(group.groupName)) {
+                if (["典籍合集", "蒙学", "儒家经典", "道家经典", "佛教经典"].includes(group.groupName)) {
                     group.tags.forEach(tag => exactCategoryNames.add(tag));
                 }
             });
@@ -817,8 +817,8 @@
             const aliases = categoryAliases[catName] || [];
             const exactOnly = exactCategoryNames.has(catName);
 
-            if (aliases.some(alias => poem.tags.includes(alias))) return true;
             if (exactOnly) return aliases.some(alias => poem.category === alias);
+            if (aliases.some(alias => poem.tags.includes(alias))) return true;
 
             const text = poem.searchText || "";
             return aliases.some(alias => text.includes(alias));
