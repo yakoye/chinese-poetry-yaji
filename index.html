@@ -162,12 +162,16 @@
         .poem-list-table th { color: #718096; font-weight: normal; }
         .poem-list-table tr { cursor: pointer; transition: background-color 0.2s; }
         .poem-list-table tr:hover { background-color: #f7fafc; }
+        .poem-list-table tr.has-snippet td { border-bottom: 0; padding-bottom: 4px; }
+        .poem-list-table tr.match-row td {
+            padding-top: 0; font-size: 12px; line-height: 1.7; color: #718096;
+        }
         
         /* 标题：占用绝大部分空间，允许折行 */
         .col-title { width: 65%; font-weight: bold; color: #2b6cb0; word-break: break-word; }
         .match-snippet {
-            margin-top: 6px; font-size: 12px; line-height: 1.7; color: #718096;
-            font-weight: normal; word-break: break-word;
+            font-size: 12px; line-height: 1.7; color: #718096;
+            font-weight: normal; word-break: break-word; width: 100%;
         }
         /* 作者：占用适当空间，允许折行 */
         .col-author { width: 20%; word-break: break-word; }
@@ -1334,13 +1338,7 @@
                 const tr = document.createElement('tr');
                 const visibleTags = uniqueList([p.category, ...(p.tags || []).filter(tag => tag !== p.category)]).slice(0, 3).join(" / ");
                 const matchSnippet = getSearchMatchSnippet(p);
-                const snippetHTML = matchSnippet ? `<div class="match-snippet">${renderTextWithHighlight(matchSnippet)}</div>` : "";
-                tr.innerHTML = `
-                    <td class="col-title">《${renderTextWithHighlight(p.title)}》${snippetHTML}</td>
-                    <td class="col-author">${renderTextWithHighlight(`${p.dynasty} · ${p.author}`)}</td>
-                    <td class="col-cat">${renderTextWithHighlight(visibleTags)}</td>`;
-                
-                tr.addEventListener('click', () => {
+                const openPoem = () => {
                     const selection = window.getSelection().toString();
                     if (selection.length > 0) {
                         return; 
@@ -1349,8 +1347,22 @@
                     updateCategoryControl(currentCategory);
                     switchView('read');
                     renderPoem(poetryDB.findIndex(item => item.id === p.id));
-                });
+                };
+                if (matchSnippet) tr.classList.add('has-snippet');
+                tr.innerHTML = `
+                    <td class="col-title">《${renderTextWithHighlight(p.title)}》</td>
+                    <td class="col-author">${renderTextWithHighlight(`${p.dynasty} · ${p.author}`)}</td>
+                    <td class="col-cat">${renderTextWithHighlight(visibleTags)}</td>`;
+                
+                tr.addEventListener('click', openPoem);
                 listTableBody.appendChild(tr);
+                if (matchSnippet) {
+                    const snippetTr = document.createElement('tr');
+                    snippetTr.className = 'match-row';
+                    snippetTr.innerHTML = `<td colspan="3"><div class="match-snippet">${renderTextWithHighlight(matchSnippet)}</div></td>`;
+                    snippetTr.addEventListener('click', openPoem);
+                    listTableBody.appendChild(snippetTr);
+                }
             }
         }
 
